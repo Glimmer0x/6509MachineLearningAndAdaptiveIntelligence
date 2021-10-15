@@ -1,5 +1,6 @@
 # 6509 Machine Learning and Adaptive Intelligence
 
+- **Lecture and Lab Notes of  MLAI class, author: Glimmer**
 - Lecturer → Dr. Mauricio A. Álvarez + Dr. Haiping Liu
 - Reading List:
     - [ ]  Rogers and Girolami, A First Course in Machine Learning, Chapman and Hall/CRC Press, 2nd Edition, 2016
@@ -29,7 +30,7 @@
     →  $i=1,...,n$ and $j=1,...,m$
         - Properties: $P(X = x_{i}, Y = y_{j}) \geq 0$  , and $\sum_{i=1}^{n}\sum_{j=1}^{m} P(X=x_{i}, Y=y_{i}) =1$
         - Marginal pmf: $P(X=x_{i}) = \sum_{j=1}^{m} P(X=x_{i}, Y=y_{i})$ → the sum rule of probability
-        - Conditional pmf: $P(X=x_{i}| Y=y_{i}) = \frac{P(X=x_{i}, Y=y_{i})}{P(Y=y_{1})}$, when $P(Y=y_{j}) \neq 0$
+        - Conditional pmf: $P(X=x_{i}| Y=y_{j}) = \frac{P(X=x_{i}, Y=y_{j})}{P(Y=y_{j})}$, when $P(Y=y_{j}) \neq 0$
         or $P(X=x_{i} \mid Y=y_{j}) \times P(Y=y_{j}) = P(X=x_{i}, Y=y_{j})$  → product rule of probability
         - Sampling → $P(X=x_{i}, Y=y_{j}) = \lim_{N \rightarrow \infty} \frac{n_{X=x_{i}, Y=y_{j}}}{N}$
         
@@ -75,7 +76,7 @@
 - Metrics in classification
     - Confussion matrix: **TP** → true positive, **TN** → true negative, **FP** and **FN**
     → $\text{precision} = \frac{TP}{TP+FP}$ → correct positive predictions in all positive **predictions**
-    →$\text{recall} = \frac{TP}{TP+FN}$ → correct positive predictions in all positive **examples**
+    → $\text{recall} = \frac{TP}{TP+FN}$ → correct positive predictions in all positive **examples**
     - Accuracy → $\text{accuracy} = \frac{TP+TN}{TP+TN+FP+FN}$
     → Acc is useful when all classes are equally important
     → But it can be misleading in imbalance classification problems
@@ -97,7 +98,7 @@
     - Feature selection and feature engineering → remove independent features relative to the target
     → Feature scaling ⇒ $log(x), \sqrt{x}$, etc. 
     → **normalization** (or min-max scaling) and **standardization** (or z-score normalization)
-    → standardisation $\hat{X}_j = \frac{X_j - \mu_{j}}{\sigma_j}$ for feature $X_j$
+    → standardisation $\hat{X}_j = \frac{X_j - \mu_{j}}{\sigma_j}$, for feature $X_j$
 - Shortlist models and then fine-tune them
 → Try different models from several categories (e.g. linear, non-linear, probabilistic, non-probabilistic)
 → shortlist two to three models that look promising
@@ -105,3 +106,59 @@
 → Finally, use the test data to assess the generalisation error of your ML system.
 
 ---
+
+# Part3 Decision trees and ensemble methods
+
+## Decision trees
+
+- Definitions →a root node + interior nodes + leaf nodes
+⇒ non-leaf nodes → contain query’s descriptive features
+⇒ leaf nodes → specifies a predicted classification
+    - Informative features → a feature make homogeneous sets
+- **Shannon's Entropy** → always set $s=2$
+    - $H(t,\mathcal{D}) = -\sum_{i\in \text{levels}(t)}(P(t=l)\times \mathrm{log}_{s}(P(t=l)))$
+- **Information Gain** → find a feature to split instances while maximize IG
+    - $IG(d,\mathcal{D})=H(t,\mathcal{D})+IV(d,\mathcal{D})$
+    - Intrinsic value $IV(d, \mathcal{D})=\sum_{l \in \text { levels }(d)} \underbrace{\frac{\left|\mathcal{D}_{d=l}\right|}{|\mathcal{D}|}}_{\text {weighting }} \times \underbrace{H\left(t, \mathcal{D}_{d=l}\right)}_{{\text { entropy of }} \text { partition } \mathcal{D}_{d=1}}$
+- Handling continuous features
+    - Thresholds and partitions
+    → sort instances and then calculate the medium value between instances
+- The ID3 Algorithm (Iterative Dichotomizer 3) → Greedy
+→ aim to create the shallowest tree
+→ in a recursive, depth-first manner to maximize IG
+- The CART Algorithm (Classification and Regression Trees)→ Greedy
+→ each node to find the feature and threshold to maximize IG
+- **Regression trees**
+→ reduce the variance in the set of training examples at each of the leaf nodes
+    - $var(t,\mathcal{D}) = \frac{\sum_{i=1}^{n}(t_i-\bar{t})^2}{n-1}$
+    - minimizes $\mathbf{d}[\text { best }]=\underset{d \in \mathbf{d}}{\operatorname{argmin}} \sum_{l \in \text { levels }(d)} \frac{\left|\mathcal{D}_{d=l}\right|}{|\mathcal{D}|} \times \operatorname{var}\left(t, \mathcal{D}_{d=l}\right)$
+- Gini index → Another commonly used measure of impurity → misclassify measurement
+    - $\operatorname{Gini}(t, \mathcal{D})=1-\sum_{l \in \text { levels }(t)} P(t=l)^{2}$
+- Information gain ratio → addressing problem that IG prioritizes features with many values
+    - $G R(d, \mathcal{D})=\frac{IG(d, \mathcal{D})}{-\sum_{l \in \text { levels }(d)}\left(P(d=l) \times \log _{2}(P(d=l))\right)}=\frac{IG(d, \mathcal{D})}{IV(d, \mathcal{D})}$
+- Overfitting and Tree Pruning
+    - Pre-pruning → stop the recursive partitioning early
+    - Post-pruning → prune the tree of the branches that cause over-fitting after growing
+        - evaluate using validation set
+
+## **Model Ensembles**
+
+- subspace sampling ⇒ randomly selected subset of the descriptive features
+- **boosting** 
+→ iteratively creating models and adding them to the ensemble with a predefined amount
+    
+    → new model pays more attention to instances that previous models miss-classified
+    
+    → by incrementally adapting the dataset used to train the models, using weighted dataset
+    
+    - Weighted Dataset ⇒ **sampling without replacement**
+    → In the beginning, weight of each instances is $\frac{1}{n}$
+    → increasing the weight of incorrect instances (such as increasing 50%)
+    - Prediction ⇒ Weighted majority vote
+- **bagging** (or bootstrap aggregating)
+→ trained on a random sample of the dataset known as **bootstrap samples**
+→ each random sample is the same size as the dataset, using **sampling with replacement**
+    - **Random forest**
+    → the combination of bagging, subspace sampling, and decision trees
+    - Prediction ⇒ Weighted average
+- boosting VS. bagging: [https://analyticsindiamag.com/primer-ensemble-learning-bagging-boosting/](https://analyticsindiamag.com/primer-ensemble-learning-bagging-boosting/)
